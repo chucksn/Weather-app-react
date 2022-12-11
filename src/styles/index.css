@@ -1,0 +1,293 @@
+* {
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Roboto", sans-serif;
+  /* border: 1px solid grey; */
+}
+
+.currentWeather-ctn {
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(24, 24, 24);
+  color: white;
+  width: 100vw;
+  padding: 5vh 10vw;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.location-date {
+  display: flex;
+  flex-direction: column;
+}
+
+.location {
+  display: inline-block;
+  font-size: 1.8rem;
+  padding: 5px 0;
+}
+
+.date {
+  color: rgb(184, 184, 184);
+  padding: 5px 0;
+}
+
+#unit-selected {
+  background-color: rgb(24, 24, 24);
+  border: none;
+  color: rgb(2, 201, 2);
+  font-size: 1rem;
+  outline: none;
+}
+
+.units-selection {
+  padding: 5px 0;
+}
+
+.new-location {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.new-location-input {
+  height: 2rem;
+  display: inline-block;
+  border-radius: 1rem;
+  border: 1px solid gray;
+  background-color: rgb(24, 24, 24);
+  text-indent: 1rem;
+  margin-right: 0.5rem;
+  color: rgb(199, 199, 199);
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-icon {
+  font-size: 1.3rem;
+  border: none;
+  background-color: rgb(24, 24, 24);
+  color: rgb(143, 143, 143);
+}
+
+.search-icon:hover {
+  cursor: pointer;
+}
+
+.currentWeather-details {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 14vh;
+}
+
+.iconTemp-detail {
+  display: flex;
+  flex-direction: row;
+  padding: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  width: 40%;
+  border-right: 1px solid rgb(36, 36, 36);
+}
+
+.temp {
+  font-size: 6vw;
+  display: block;
+}
+
+.description,
+.units,
+.temp-unit {
+  color: rgb(255, 255, 134);
+}
+
+.units {
+  font-size: 1rem;
+  font-weight: 300;
+}
+
+.icon-1 {
+  width: 12vw;
+}
+
+.other-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 60%;
+  padding: 0 10%;
+}
+
+.other-details p {
+  font-size: 0.9rem;
+  text-align: center;
+  color: rgb(143, 143, 143);
+}
+
+.top,
+.bottom {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0.8rem;
+}
+
+.values {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 300;
+  padding-bottom: 0.3rem;
+}
+
+.top {
+  border-bottom: 1px solid rgb(36, 36, 36);
+}
+
+.future-weather {
+  display: flex;
+  flex-direction: column;
+}
+
+.future-weather-text {
+  font-size: 1.3rem;
+  display: block;
+  margin: 0 0 1.5rem 4rem;
+}
+.future-weather-text > span {
+  font-size: 1rem;
+  color: rgb(143, 143, 143);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 15rem;
+  width: 10rem;
+  background-color: rgb(19, 19, 19);
+  border-radius: 0.6rem;
+  box-shadow: 0 0 3px 1px rgb(5, 5, 5);
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.future-date,
+.future-time,
+.future-temp {
+  display: block;
+  text-align: center;
+  font-weight: 300;
+}
+
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.future-date,
+.future-time {
+  color: rgb(189, 189, 189);
+}
+
+.future-date {
+  margin-bottom: 0.5rem;
+}
+
+.future-temp {
+  font-size: 1.5rem;
+}
+
+.fa-chevron-right,
+.fa-chevron-left {
+  position: absolute;
+  top: 50%;
+  color: green;
+  font-size: 2rem;
+  z-index: 20;
+}
+
+.fa-chevron-right {
+  right: 0;
+}
+
+.fa-chevron-left {
+  left: 0;
+}
+
+.outer-swiper-container {
+  position: relative;
+}
+
+.inner-swiper-container {
+  margin: 0 4rem;
+}
+
+.swiper-button-disabled {
+  opacity: 0.3;
+}
+
+@media screen and (max-width: 992px) {
+  .currentWeather-details {
+    flex-direction: column;
+  }
+
+  .iconTemp-detail {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgb(36, 36, 36);
+  }
+
+  .other-details {
+    width: 100%;
+    padding-top: 3rem;
+  }
+}
+
+@media screen and (max-width: 680px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .bottom {
+    flex-direction: column-reverse;
+    padding: 0;
+  }
+
+  .top {
+    flex-direction: column;
+    border-bottom: none;
+    padding: 0;
+  }
+
+  .values {
+    display: inline-block;
+    font-size: 1rem;
+  }
+
+  .parameter {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    border-bottom: 1px solid rgb(36, 36, 36);
+  }
+
+  .parameter > p {
+    display: inline-block;
+  }
+
+  .card {
+    width: 100%;
+  }
+
+  .future-icon {
+    width: 8vmax;
+    align-self: center;
+  }
+}
