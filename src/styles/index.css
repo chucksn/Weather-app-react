@@ -102,7 +102,8 @@
 
 .description,
 .units,
-.temp-unit {
+.temp-unit,
+.current-time {
   color: rgb(255, 255, 134);
 }
 
@@ -289,5 +290,10 @@
   .future-icon {
     width: 8vmax;
     align-self: center;
+  }
+
+  .current-time,
+  .date {
+    text-align: center;
   }
 }

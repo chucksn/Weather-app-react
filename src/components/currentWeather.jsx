@@ -2,6 +2,7 @@ import icon1 from "../images/static-icons/rainy-3-day.svg";
 import FutureWeather from "./futureWeather";
 import { useState, useEffect, useRef } from "react";
 import { weekdays, months } from "../weekdays-months";
+import { getLocationPromise } from "../location";
 
 function CurrentWeather() {
   // function that gives date in the format - Monday 5 July
@@ -39,6 +40,14 @@ function CurrentWeather() {
     tempUnitSymbol: "C",
     windUnitSymbol: "m/s",
   });
+  const [locationCoord, setLocationCoord] = useState({});
+
+  // imported promise from location.js to get latitude & longitude
+  getLocationPromise
+    .then((location) => {
+      setLocationCoord(location);
+    })
+    .catch((err) => alert(err));
 
   const handleUnits = () => {
     units === "metric" ? setUnits("imperial") : setUnits("metric");
@@ -49,7 +58,7 @@ function CurrentWeather() {
 
   useEffect(() => {
     fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=6.5833&lon=3.75&appid=7f7e4358d1eb034538c592d2d12ef587&units=${units}`
+      `https://api.openweathermap.org/data/2.5/weather?lat=${locationCoord.latitude}&lon=${locationCoord.longitude}&appid=7f7e4358d1eb034538c592d2d12ef587&units=${units}`
     )
       .then((response) => response.json())
       .then((data) => {
@@ -68,11 +77,13 @@ function CurrentWeather() {
         let currentDateData = dateFormat_1(new Date(data.dt * 1000));
         let sunriseData = amPmTimeFormat(new Date(data.sys.sunrise * 1000));
         let sunsetData = amPmTimeFormat(new Date(data.sys.sunset * 1000));
+        let currentTimeData = amPmTimeFormat(new Date());
 
         setWeatherInfo((previousState) => {
           return {
             ...previousState,
             date: currentDateData,
+            currentTime: currentTimeData,
             temp: TempData,
             sunrise: sunriseData,
             pressure: pressureData,
@@ -88,7 +99,7 @@ function CurrentWeather() {
           };
         });
       });
-  }, [units]);
+  }, [units, locationCoord]);
 
   return (
     <div className="currentWeather-ctn">
@@ -100,6 +111,7 @@ function CurrentWeather() {
               <span className="countryCode">{weatherInfo.country}</span>
             </span>
             <span className="date">{weatherInfo.date}</span>
+            <span className="current-time">{weatherInfo.currentTime}</span>
           </div>
 
           <div className="units-selection">
