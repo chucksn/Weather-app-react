@@ -2,7 +2,7 @@
 import FutureWeather from "./futureWeather";
 import { useState, useEffect, useRef } from "react";
 import { weekdays, months } from "../weekdays-months";
-import { getLocationPromise } from "../location";
+import { getLocationPromise } from "../getCurrentLocation";
 import { icons } from "../weatherIcon";
 
 function CurrentWeather() {
