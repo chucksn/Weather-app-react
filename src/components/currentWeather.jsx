@@ -1,8 +1,9 @@
-import icon1 from "../images/static-icons/rainy-3-day.svg";
+// import icon1 from "../images/static-icons/rainy-3-day.svg";
 import FutureWeather from "./futureWeather";
 import { useState, useEffect, useRef } from "react";
 import { weekdays, months } from "../weekdays-months";
 import { getLocationPromise } from "../location";
+import { icons } from "../weatherIcon";
 
 function CurrentWeather() {
   // function that gives date in the format - Monday 5 July
@@ -41,19 +42,42 @@ function CurrentWeather() {
     windUnitSymbol: "m/s",
   });
   const [locationCoord, setLocationCoord] = useState({});
+  const locationInput = useRef();
 
-  // imported promise from location.js to get latitude & longitude
-  getLocationPromise
-    .then((location) => {
-      setLocationCoord(location);
-    })
-    .catch((err) => alert(err));
-
+  // on loading of the page call promise from location.js to get latitude & longitude of current location
+  window.addEventListener("load", () => {
+    getLocationPromise
+      .then((location) => {
+        setLocationCoord(location);
+      })
+      .catch((err) => alert(err));
+  });
   const handleUnits = () => {
     units === "metric" ? setUnits("imperial") : setUnits("metric");
     units === "metric"
       ? setUnitSymbol({ tempUnitSymbol: "F", windUnitSymbol: "mph" })
       : setUnitSymbol({ tempUnitSymbol: "C", windUnitSymbol: "m/s" });
+  };
+
+  const handleSearchBtn = () => {
+    let newLocation = locationInput.current.value;
+
+    fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${newLocation}&appid=7f7e4358d1eb034538c592d2d12ef587`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        let lati = data.coord.lat;
+        let long = data.coord.lon;
+        setLocationCoord({ latitude: lati, longitude: long });
+      })
+      .catch(() => alert("INVALID LOCATION: Enter a valid City name"));
+  };
+
+  const handleSearchOnEnterKey = (event) => {
+    if (event.key === "Enter") {
+      handleSearchBtn();
+    }
   };
 
   useEffect(() => {
@@ -62,7 +86,7 @@ function CurrentWeather() {
     )
       .then((response) => response.json())
       .then((data) => {
-        let cityNameData = data.name;
+        let cityNameData = `${data.name},`;
         let countryCodeData = data.sys.country;
         let TempData = parseInt(data.main.temp);
         let pressureData = data.main.pressure;
@@ -70,6 +94,7 @@ function CurrentWeather() {
         let tempMinData = parseInt(data.main.temp_min);
         let humidityData = data.main.humidity;
         let windData = data.wind.speed;
+        let iconData = data.weather[0].icon;
         let weatherDescriptionData =
           data.weather[0].description.charAt(0).toUpperCase() +
           data.weather[0].description.slice(1);
@@ -77,7 +102,7 @@ function CurrentWeather() {
         let currentDateData = dateFormat_1(new Date(data.dt * 1000));
         let sunriseData = amPmTimeFormat(new Date(data.sys.sunrise * 1000));
         let sunsetData = amPmTimeFormat(new Date(data.sys.sunset * 1000));
-        let currentTimeData = amPmTimeFormat(new Date());
+        let currentTimeData = "Weather . now";
 
         setWeatherInfo((previousState) => {
           return {
@@ -85,6 +110,7 @@ function CurrentWeather() {
             date: currentDateData,
             currentTime: currentTimeData,
             temp: TempData,
+            icon: iconData,
             sunrise: sunriseData,
             pressure: pressureData,
             maxTemp: tempMaxData,
@@ -107,7 +133,7 @@ function CurrentWeather() {
         <div className="header">
           <div className="location-date">
             <span className="location">
-              {weatherInfo.city},{" "}
+              {weatherInfo.city}{" "}
               <span className="countryCode">{weatherInfo.country}</span>
             </span>
             <span className="date">{weatherInfo.date}</span>
@@ -125,12 +151,15 @@ function CurrentWeather() {
           </div>
           <div className="new-location">
             <input
+              onKeyDown={handleSearchOnEnterKey}
               type="text"
+              spellCheck="false"
+              ref={locationInput}
               className="new-location-input"
-              placeholder="Enter new location"
+              placeholder="Enter City"
               autoFocus
             />
-            <button className="search-icon">
+            <button onClick={handleSearchBtn} className="search-icon">
               <i className="fa-solid fa-magnifying-glass"></i>
             </button>
           </div>
@@ -139,7 +168,7 @@ function CurrentWeather() {
       <div className="currentWeather-details">
         <div className="iconTemp-detail">
           <div className="icon">
-            <img className="icon-1" src={icon1} alt="weather icon" />
+            <img className="icon-1" src={icons[weatherInfo.icon]} alt="icon" />
           </div>
           <div className="tempAndDescription">
             <span className="temp">
