@@ -1,9 +1,11 @@
 // import icon1 from "../images/static-icons/rainy-3-day.svg";
 import FutureWeather from "./futureWeather";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, createContext } from "react";
 import { weekdays, months } from "../weekdays-months";
 import { getLocationPromise } from "../getCurrentLocation";
 import { icons } from "../weatherIcon";
+
+export const FWeatherContext = createContext();
 
 function CurrentWeather() {
   // function that gives date in the format - Monday 5 July
@@ -35,23 +37,16 @@ function CurrentWeather() {
     return strTime;
   };
 
+  const [locationCoord, setLocationCoord] = useState({});
   const [weatherInfo, setWeatherInfo] = useState({});
+  const [fWeatherData, setFWeatherData] = useState({});
   const [units, setUnits] = useState("metric");
   const [unitSymbol, setUnitSymbol] = useState({
     tempUnitSymbol: "C",
     windUnitSymbol: "m/s",
   });
-  const [locationCoord, setLocationCoord] = useState({});
   const locationInput = useRef();
 
-  // on loading of the page call promise from location.js to get latitude & longitude of current location
-  window.addEventListener("load", () => {
-    getLocationPromise
-      .then((location) => {
-        setLocationCoord(location);
-      })
-      .catch((err) => alert(err));
-  });
   const handleUnits = () => {
     units === "metric" ? setUnits("imperial") : setUnits("metric");
     units === "metric"
@@ -70,8 +65,13 @@ function CurrentWeather() {
         let lati = data.coord.lat;
         let long = data.coord.lon;
         setLocationCoord({ latitude: lati, longitude: long });
+        return fetch(
+          `https://api.openweathermap.org/data/2.5/forecast?q=${newLocation}&appid=984780996d1e8537e803bc8568060dee&units=${units}`
+        );
       })
-      .catch(() => alert("INVALID LOCATION: Enter a valid City name"));
+      .catch(() => alert("INVALID LOCATION: Enter a valid City name"))
+      .then((res) => res.json())
+      .then((fData) => setFWeatherData(fData));
   };
 
   const handleSearchOnEnterKey = (event) => {
@@ -79,6 +79,17 @@ function CurrentWeather() {
       handleSearchBtn();
     }
   };
+
+  // on loading of the page call promise from location.js to get latitude & longitude of current location
+
+  window.addEventListener("load", () => {
+    getLocationPromise
+      .then((location) => {
+        setLocationCoord(location);
+        return;
+      })
+      .catch((err) => alert(err));
+  });
 
   useEffect(() => {
     fetch(
@@ -90,8 +101,6 @@ function CurrentWeather() {
         let countryCodeData = data.sys.country;
         let TempData = parseInt(data.main.temp);
         let pressureData = data.main.pressure;
-        let tempMaxData = parseInt(data.main.temp_max);
-        let tempMinData = parseInt(data.main.temp_min);
         let humidityData = data.main.humidity;
         let windData = data.wind.speed;
         let iconData = data.weather[0].icon;
@@ -103,7 +112,6 @@ function CurrentWeather() {
         let sunriseData = amPmTimeFormat(new Date(data.sys.sunrise * 1000));
         let sunsetData = amPmTimeFormat(new Date(data.sys.sunset * 1000));
         let currentTimeData = "Weather . now";
-
         setWeatherInfo((previousState) => {
           return {
             ...previousState,
@@ -113,8 +121,6 @@ function CurrentWeather() {
             icon: iconData,
             sunrise: sunriseData,
             pressure: pressureData,
-            maxTemp: tempMaxData,
-            minTemp: tempMinData,
             humidity: humidityData,
             wind: windData,
             visibility: visibilityData,
@@ -124,7 +130,12 @@ function CurrentWeather() {
             country: countryCodeData,
           };
         });
-      });
+        return fetch(
+          `https://api.openweathermap.org/data/2.5/forecast?lat=${locationCoord.latitude}&lon=${locationCoord.longitude}&appid=984780996d1e8537e803bc8568060dee&units=${units}`
+        );
+      })
+      .then((res) => res.json())
+      .then((fData) => setFWeatherData(fData));
   }, [units, locationCoord]);
 
   return (
@@ -219,7 +230,16 @@ function CurrentWeather() {
           </div>
         </div>
       </div>
-      <FutureWeather />
+      <FWeatherContext.Provider
+        value={{
+          value1: fWeatherData,
+          value2: unitSymbol,
+          value3: dateFormat_2,
+          value4: amPmTimeFormat,
+        }}
+      >
+        <FutureWeather />
+      </FWeatherContext.Provider>
     </div>
   );
 }
