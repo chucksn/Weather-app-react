@@ -51,6 +51,10 @@ function FutureWeatherSlides() {
                   fDate={dateFormat_2(new Date(card.dt * 1000))}
                   fTime={amPmTimeFormat(new Date(card.dt * 1000))}
                   fIcon={icons[card.weather[0].icon]}
+                  fDescription={
+                    card.weather[0].description.charAt(0).toUpperCase() +
+                    card.weather[0].description.slice(1)
+                  }
                 />
               </SwiperSlide>
             ))}

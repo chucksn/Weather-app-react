@@ -13,6 +13,7 @@ function CurrentWeather() {
     date: "",
     currentTime: "loading....",
     temp: "",
+    feelsLike: "",
     icon: "",
     sunrise: "--",
     pressure: "--",
@@ -48,6 +49,7 @@ function CurrentWeather() {
           date: dateFormat_1(new Date(weatherData.dt * 1000)),
           currentTime: "Weather . now",
           temp: parseInt(weatherData.main.temp),
+          feelsLike: parseInt(weatherData.main.feels_like),
           icon: weatherData.weather[0].icon,
           sunrise: amPmTimeFormat(new Date(weatherData.sys.sunrise * 1000)),
           pressure: weatherData.main.pressure,
@@ -104,6 +106,7 @@ function CurrentWeather() {
             date: dateFormat_1(new Date(data.dt * 1000)),
             currentTime: "Weather . now",
             temp: parseInt(data.main.temp),
+            feelsLike: parseInt(data.main.feels_like),
             icon: data.weather[0].icon,
             sunrise: amPmTimeFormat(new Date(data.sys.sunrise * 1000)),
             pressure: data.main.pressure,
@@ -181,13 +184,20 @@ function CurrentWeather() {
         <div className="iconTemp-detail">
           <div className="icon">
             <img className="icon-1" src={icons[weatherInfo.icon]} alt="icon" />
+            <span className="description">{weatherInfo.description}</span>
           </div>
           <div className="tempAndDescription">
             <span className="temp">
               {weatherInfo.temp}&#176;
               <span className="temp-unit">{unitSymbol.tempUnitSymbol}</span>
             </span>
-            <span className="description">{weatherInfo.description}</span>
+            <span className="temp-feeling">
+              Feels like{" "}
+              <span className="edit-temp-feeling">
+                {weatherInfo.feelsLike}&#176;
+              </span>
+              <span className="temp-unit">{unitSymbol.tempUnitSymbol}</span>
+            </span>
           </div>
         </div>
         <div className="other-details">
