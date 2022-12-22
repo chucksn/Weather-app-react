@@ -97,7 +97,7 @@ function CurrentWeather() {
       );
       let data = await response.json();
 
-      if (data.cod === 200) {
+      if (response.status === 200) {
         setWeatherInfo((previousState) => {
           return {
             ...previousState,
@@ -118,16 +118,16 @@ function CurrentWeather() {
             country: data.sys.country,
           };
         });
+
+        let fWeatherResponse = await fetch(
+          `https://api.openweathermap.org/data/2.5/forecast?q=${newLocation}&appid=984780996d1e8537e803bc8568060dee&units=${units}`
+        );
+
+        let fData = await fWeatherResponse.json();
+        setFWeatherData(fData);
       } else {
         alert("CITY NOT FOUND: Enter a valid city name");
       }
-
-      let fWeatherResponse = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?q=${newLocation}&appid=984780996d1e8537e803bc8568060dee&units=${units}`
-      );
-
-      let fData = await fWeatherResponse.json();
-      setFWeatherData(fData);
     };
 
     getWDataBySearch();

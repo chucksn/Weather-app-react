@@ -23,7 +23,7 @@ function FutureWeatherSlides() {
         <i className="fa-solid fa-chevron-left"></i>
         <div className="inner-swiper-container">
           <Swiper
-            spaceBetween={50}
+            spaceBetween={0}
             modules={[Navigation]}
             navigation={{
               nextEl: ".fa-chevron-right",

@@ -170,9 +170,9 @@
   flex-direction: column;
   height: 15rem;
   width: 10rem;
-  background-color: rgb(10, 10, 10);
+  background-color: rgb(16, 16, 16);
   border-radius: 0.6rem;
-  box-shadow: 0 0 3px 1px black;
+  box-shadow: 0 0 3px 1px aqua;
   justify-content: space-between;
   padding: 1rem;
 }
@@ -188,6 +188,12 @@
 .swiper {
   width: 100%;
   height: 100%;
+}
+
+.swiper-slide {
+  margin-top: 3px;
+  margin-left: 3px;
+  margin-bottom: 3px;
 }
 
 .future-date,
@@ -286,6 +292,7 @@
 
   .card {
     width: 100%;
+    box-shadow: 0 0 3px 1px aqua inset;
   }
 
   .future-icon {
@@ -296,5 +303,20 @@
   .current-time,
   .date {
     text-align: center;
+  }
+
+  .swiper-slide {
+    margin: 0;
+  }
+
+  .future-date,
+  .future-time,
+  .future-temp,
+  .parameter > p,
+  .values,
+  .temp,
+  .temp-unit,
+  .description {
+    font-weight: 500;
   }
 }
