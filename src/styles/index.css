@@ -170,9 +170,9 @@
   flex-direction: column;
   height: 15rem;
   width: 10rem;
-  background-color: rgb(19, 19, 19);
+  background-color: rgb(10, 10, 10);
   border-radius: 0.6rem;
-  box-shadow: 0 0 3px 1px rgb(5, 5, 5);
+  box-shadow: 0 0 3px 1px black;
   justify-content: space-between;
   padding: 1rem;
 }
@@ -229,7 +229,7 @@
 }
 
 .swiper-button-disabled {
-  opacity: 0.3;
+  opacity: 0.2;
 }
 
 @media screen and (max-width: 992px) {

@@ -1,51 +1,84 @@
 // import icon1 from "../images/static-icons/rainy-3-day.svg";
 import FutureWeather from "./futureWeather";
 import { useState, useEffect, useRef, createContext } from "react";
-import { weekdays, months } from "../weekdays-months";
 import { getLocationPromise } from "../getCurrentLocation";
+import { dateFormat_1, amPmTimeFormat } from "../date-time-format";
 import { icons } from "../weatherIcon";
 
 export const FWeatherContext = createContext();
 
 function CurrentWeather() {
-  // function that gives date in the format - Monday 5 July
-  const dateFormat_1 = (date) => {
-    let weekday = weekdays[date.getDay()];
-    let dayOfMonth = date.getDate();
-    let month = months[date.getMonth()];
-    let myDateFormat = `${weekday} ${dayOfMonth} ${month}`;
-    return myDateFormat;
-  };
-
-  // function that gives date in the format - July 5
-  const dateFormat_2 = (date) => {
-    let dayOfMonth = date.getDate();
-    let month = months[date.getMonth()];
-    let myDateFormat = `${month} ${dayOfMonth}`;
-    return myDateFormat;
-  };
-
-  // function that give time in am-pm format
-  const amPmTimeFormat = (date) => {
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    let amPm = hours >= 12 ? "pm" : "am";
-    hours %= 12;
-    hours = hours ? hours : 12;
-    minutes = minutes < 10 ? `0${minutes}` : minutes;
-    let strTime = `${hours}:${minutes} ${amPm}`;
-    return strTime;
-  };
-
-  const [locationCoord, setLocationCoord] = useState({});
-  const [weatherInfo, setWeatherInfo] = useState({});
-  const [fWeatherData, setFWeatherData] = useState({});
+  // const [locationCoord, setLocationCoord] = useState({});
+  const [weatherInfo, setWeatherInfo] = useState({
+    date: "",
+    currentTime: "loading....",
+    temp: "",
+    icon: "",
+    sunrise: "--",
+    pressure: "--",
+    humidity: "--",
+    wind: "--",
+    visibility: "--",
+    sunset: "--",
+    description: "",
+    city: "",
+    country: "",
+  });
+  const [fWeatherData, setFWeatherData] = useState("");
   const [units, setUnits] = useState("metric");
   const [unitSymbol, setUnitSymbol] = useState({
     tempUnitSymbol: "C",
     windUnitSymbol: "m/s",
   });
   const locationInput = useRef();
+  const [firstRender, setFirstRenderFlag] = useState(true);
+  const [searchBtn, setSearchBtnFlag] = useState(false);
+
+  useEffect(() => {
+    const getWeatherData = async () => {
+      let currentLocation = await getLocationPromise;
+      let response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${currentLocation.latitude}&lon=${currentLocation.longitude}&appid=7f7e4358d1eb034538c592d2d12ef587&units=${units}`
+      );
+      let weatherData = await response.json();
+
+      setWeatherInfo((previousState) => {
+        return {
+          ...previousState,
+          date: dateFormat_1(new Date(weatherData.dt * 1000)),
+          currentTime: "Weather . now",
+          temp: parseInt(weatherData.main.temp),
+          icon: weatherData.weather[0].icon,
+          sunrise: amPmTimeFormat(new Date(weatherData.sys.sunrise * 1000)),
+          pressure: weatherData.main.pressure,
+          humidity: weatherData.main.humidity,
+          wind: weatherData.wind.speed,
+          visibility: weatherData.visibility / 1000,
+          sunset: amPmTimeFormat(new Date(weatherData.sys.sunset * 1000)),
+          description:
+            weatherData.weather[0].description.charAt(0).toUpperCase() +
+            weatherData.weather[0].description.slice(1),
+          city: `${weatherData.name},`,
+          country: weatherData.sys.country,
+        };
+      });
+
+      let fWeatherResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${currentLocation.latitude}&lon=${currentLocation.longitude}&appid=984780996d1e8537e803bc8568060dee&units=${units}`
+      );
+
+      let fData = await fWeatherResponse.json();
+      setFWeatherData(fData);
+    };
+
+    if (firstRender) getWeatherData();
+  }, [units, firstRender]);
+
+  useEffect(() => {
+    if (searchBtn) {
+      handleSearchBtn();
+    }
+  }, [units]);
 
   const handleUnits = () => {
     units === "metric" ? setUnits("imperial") : setUnits("metric");
@@ -55,23 +88,49 @@ function CurrentWeather() {
   };
 
   const handleSearchBtn = () => {
+    setFirstRenderFlag(false);
+    setSearchBtnFlag(true);
     let newLocation = locationInput.current.value;
+    const getWDataBySearch = async () => {
+      let response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${newLocation}&appid=7f7e4358d1eb034538c592d2d12ef587&units=${units}`
+      );
+      let data = await response.json();
 
-    fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${newLocation}&appid=7f7e4358d1eb034538c592d2d12ef587`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        let lati = data.coord.lat;
-        let long = data.coord.lon;
-        setLocationCoord({ latitude: lati, longitude: long });
-        return fetch(
-          `https://api.openweathermap.org/data/2.5/forecast?q=${newLocation}&appid=984780996d1e8537e803bc8568060dee&units=${units}`
-        );
-      })
-      .catch(() => alert("INVALID LOCATION: Enter a valid City name"))
-      .then((res) => res.json())
-      .then((fData) => setFWeatherData(fData));
+      if (data.cod === 200) {
+        setWeatherInfo((previousState) => {
+          return {
+            ...previousState,
+            date: dateFormat_1(new Date(data.dt * 1000)),
+            currentTime: "Weather . now",
+            temp: parseInt(data.main.temp),
+            icon: data.weather[0].icon,
+            sunrise: amPmTimeFormat(new Date(data.sys.sunrise * 1000)),
+            pressure: data.main.pressure,
+            humidity: data.main.humidity,
+            wind: data.wind.speed,
+            visibility: data.visibility / 1000,
+            sunset: amPmTimeFormat(new Date(data.sys.sunset * 1000)),
+            description:
+              data.weather[0].description.charAt(0).toUpperCase() +
+              data.weather[0].description.slice(1),
+            city: `${data.name},`,
+            country: data.sys.country,
+          };
+        });
+      } else {
+        alert("CITY NOT FOUND: Enter a valid city name");
+      }
+
+      let fWeatherResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/forecast?q=${newLocation}&appid=984780996d1e8537e803bc8568060dee&units=${units}`
+      );
+
+      let fData = await fWeatherResponse.json();
+      setFWeatherData(fData);
+    };
+
+    getWDataBySearch();
   };
 
   const handleSearchOnEnterKey = (event) => {
@@ -79,64 +138,6 @@ function CurrentWeather() {
       handleSearchBtn();
     }
   };
-
-  // on loading of the page call promise from location.js to get latitude & longitude of current location
-
-  window.addEventListener("load", () => {
-    getLocationPromise
-      .then((location) => {
-        setLocationCoord(location);
-        return;
-      })
-      .catch((err) => alert(err));
-  });
-
-  useEffect(() => {
-    fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${locationCoord.latitude}&lon=${locationCoord.longitude}&appid=7f7e4358d1eb034538c592d2d12ef587&units=${units}`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        let cityNameData = `${data.name},`;
-        let countryCodeData = data.sys.country;
-        let TempData = parseInt(data.main.temp);
-        let pressureData = data.main.pressure;
-        let humidityData = data.main.humidity;
-        let windData = data.wind.speed;
-        let iconData = data.weather[0].icon;
-        let weatherDescriptionData =
-          data.weather[0].description.charAt(0).toUpperCase() +
-          data.weather[0].description.slice(1);
-        let visibilityData = data.visibility / 1000;
-        let currentDateData = dateFormat_1(new Date(data.dt * 1000));
-        let sunriseData = amPmTimeFormat(new Date(data.sys.sunrise * 1000));
-        let sunsetData = amPmTimeFormat(new Date(data.sys.sunset * 1000));
-        let currentTimeData = "Weather . now";
-        setWeatherInfo((previousState) => {
-          return {
-            ...previousState,
-            date: currentDateData,
-            currentTime: currentTimeData,
-            temp: TempData,
-            icon: iconData,
-            sunrise: sunriseData,
-            pressure: pressureData,
-            humidity: humidityData,
-            wind: windData,
-            visibility: visibilityData,
-            sunset: sunsetData,
-            description: weatherDescriptionData,
-            city: cityNameData,
-            country: countryCodeData,
-          };
-        });
-        return fetch(
-          `https://api.openweathermap.org/data/2.5/forecast?lat=${locationCoord.latitude}&lon=${locationCoord.longitude}&appid=984780996d1e8537e803bc8568060dee&units=${units}`
-        );
-      })
-      .then((res) => res.json())
-      .then((fData) => setFWeatherData(fData));
-  }, [units, locationCoord]);
 
   return (
     <div className="currentWeather-ctn">
@@ -234,8 +235,6 @@ function CurrentWeather() {
         value={{
           value1: fWeatherData,
           value2: unitSymbol,
-          value3: dateFormat_2,
-          value4: amPmTimeFormat,
         }}
       >
         <FutureWeather />
