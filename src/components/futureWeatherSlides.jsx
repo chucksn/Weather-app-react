@@ -23,6 +23,7 @@ function FutureWeatherSlides() {
       <div className="inner-swiper-container">
         <Swiper
           spaceBetween={50}
+          loop={true}
           autoplay={{
             delay: 2000,
             disableOnInteraction: false,
