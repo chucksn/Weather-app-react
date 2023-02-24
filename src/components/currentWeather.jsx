@@ -1,4 +1,3 @@
-// import icon1 from "../images/static-icons/rainy-3-day.svg";
 import FutureWeather from "./futureWeather";
 import { useState, useEffect, useRef, createContext } from "react";
 import { getLocationPromise } from "../getCurrentLocation";
@@ -8,10 +7,9 @@ import { icons } from "../weatherIcon";
 export const FWeatherContext = createContext();
 
 function CurrentWeather() {
-  // const [locationCoord, setLocationCoord] = useState({});
   const [weatherInfo, setWeatherInfo] = useState({
     date: "",
-    currentTime: "loading....",
+    currentTime: "",
     temp: "",
     feelsLike: "",
     icon: "",
@@ -181,25 +179,33 @@ function CurrentWeather() {
         </div>
       </div>
       <div className="currentWeather-details">
-        <div className="iconTemp-detail">
-          <div className="icon">
-            <img className="icon-1" src={icons[weatherInfo.icon]} alt="icon" />
-            <span className="description">{weatherInfo.description}</span>
-          </div>
-          <div className="tempAndDescription">
-            <span className="temp">
-              {weatherInfo.temp}&#176;
-              <span className="temp-unit">{unitSymbol.tempUnitSymbol}</span>
-            </span>
-            <span className="temp-feeling">
-              Feels like{" "}
-              <span className="edit-temp-feeling">
-                {weatherInfo.feelsLike}&#176;
-              </span>
-              <span className="temp-unit">{unitSymbol.tempUnitSymbol}</span>
-            </span>
-          </div>
-        </div>
+        {weatherInfo.icon &&
+          weatherInfo.description &&
+          weatherInfo.feelsLike && (
+            <div className="iconTemp-detail">
+              <div className="icon">
+                <img
+                  className="icon-1"
+                  src={icons[weatherInfo.icon]}
+                  alt="icon"
+                />
+                <span className="description">{weatherInfo.description}</span>
+              </div>
+              <div className="tempAndDescription">
+                <span className="temp">
+                  {weatherInfo.temp}&#176;
+                  <span className="temp-unit">{unitSymbol.tempUnitSymbol}</span>
+                </span>
+                <span className="temp-feeling">
+                  Feels like{" "}
+                  <span className="edit-temp-feeling">
+                    {weatherInfo.feelsLike}&#176;
+                  </span>
+                  <span className="temp-unit">{unitSymbol.tempUnitSymbol}</span>
+                </span>
+              </div>
+            </div>
+          )}
         <div className="other-details">
           <div className="top">
             <div className="parameter">
